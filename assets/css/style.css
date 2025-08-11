@@ -1452,7 +1452,7 @@ html {
 .service-item {
     -webkit-transition: 0.5s;
     transition: 0.5s;
-    padding: 60px 40px;
+    padding: 40px 40px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
     margin: 15px;

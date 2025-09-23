@@ -27,7 +27,7 @@
 
         $.ajax({
             type: "POST",
-            url: "assets/php/form-process.php",
+            url: "https://script.google.com/macros/s/AKfycbz8QMx2QbRE_I5pDLvb_AU-jUL4vCTneYqkOQxhkc0o87BdtgO5T0A50XnHNC3VRo9u/exec",
             data: "name=" + name + "&email=" + email + "&phone_number=" + phone_number + "&subject=" + subject + "&message=" + message,
             success : function(text){
                 if (text == "success"){

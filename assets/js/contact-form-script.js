@@ -1,5 +1,5 @@
 /*==============================================================*/
-// Klev Contact Form  JS
+// Klev Contact Form JS
 /*==============================================================*/
 (function ($) {
     "use strict"; // Start of use strict
@@ -15,7 +15,6 @@
         }
     });
 
-
     function submitForm(){
         // Initiate Variables With Form Content
         var name = $("#name").val();
@@ -24,25 +23,42 @@
         var subject = $("#subject").val();
         var message = $("#message").val();
 
-
         $.ajax({
             type: "POST",
             url: "https://script.google.com/macros/s/AKfycbz8QMx2QbRE_I5pDLvb_AU-jUL4vCTneYqkOQxhkc0o87BdtgO5T0A50XnHNC3VRo9u/exec",
-            data: "name=" + name + "&email=" + email + "&phone_number=" + phone_number + "&subject=" + subject + "&message=" + message,
+            data: {
+                name: name,
+                email: email,
+                phone_number: phone_number,
+                subject: subject,
+                message: message
+            },
             success : function(text){
                 if (text == "success"){
                     formSuccess();
                 } else {
                     formError();
-                    submitMSG(false,text);
+                    submitMSG(false, text);
                 }
+            },
+            error: function() {
+                formError();
+                submitMSG(false, "Something went wrong. Please try again later.");
             }
         });
     }
 
     function formSuccess(){
+        // Reset form
         $("#contactForm")[0].reset();
-        submitMSG(true, "Message Submitted!")
+
+        // Show success message
+        submitMSG(true, "✅ Message Submitted!");
+
+        // Disable submit button to prevent follow-ups
+        $("#contactForm button[type=submit]")
+            .prop("disabled", true)
+            .text("Message Sent");
     }
 
     function formError(){
@@ -52,12 +68,10 @@
     }
 
     function submitMSG(valid, msg){
-        if(valid){
-            var msgClasses = "h4 text-left tada animated text-success";
-        } else {
-            var msgClasses = "h4 text-left text-danger";
-        }
+        var msgClasses = valid
+            ? "h4 text-left tada animated text-success"
+            : "h4 text-left text-danger";
+
         $("#msgSubmit").removeClass().addClass(msgClasses).text(msg);
     }
 }(jQuery)); // End of use strict
-

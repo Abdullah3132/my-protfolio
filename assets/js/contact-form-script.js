@@ -60,3 +60,4 @@
         $("#msgSubmit").removeClass().addClass(msgClasses).text(msg);
     }
 }(jQuery)); // End of use strict
+

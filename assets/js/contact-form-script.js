@@ -1,77 +1,49 @@
-/*==============================================================*/
-// Klev Contact Form JS
-/*==============================================================*/
 (function ($) {
-    "use strict"; // Start of use strict
-    $("#contactForm").validator().on("submit", function (event) {
-        if (event.isDefaultPrevented()) {
-            // handle the invalid form...
-            formError();
-            submitMSG(false, "Did you fill in the form properly?");
-        } else {
-            // everything looks good!
-            event.preventDefault();
-            submitForm();
+  "use strict";
+
+  // Run after DOM is ready so the form exists
+  $(function () {
+    var $form = $("#contactForm");
+    var $btn  = $form.find('button[type="submit"]');
+    var $msg  = $("#msgSubmit");
+
+    $form.on("submit", function (e) {
+      e.preventDefault(); // stop navigation to script.googleusercontent.com
+
+      // Use native HTML5 validation if present
+      if (this.checkValidity && !this.checkValidity()) {
+        this.reportValidity();
+        return;
+      }
+
+      // UX: lock the button to prevent follow-ups
+      $btn.prop("disabled", true).text("Sending...");
+
+      $.ajax({
+        type: "POST",
+        url: $form.attr("action"),
+        data: $form.serialize(),          // sends all fields (name, email, etc.)
+        success: function (resp) {
+          // Handle both JSON response and "success" string
+          var data = null;
+          try { data = (typeof resp === "string") ? JSON.parse(resp) : resp; } catch (_) {}
+          var ok = (data && data.success === true) || resp === "success";
+          var msgText = (data && data.message) ? data.message : "Message Submitted!";
+
+          if (ok) {
+            $form[0].reset();
+            $msg.removeClass().addClass("h4 text-left tada animated text-success").text("✅ " + msgText);
+            $btn.text("Message Sent");     // keep disabled → no follow-up submits
+          } else {
+            $msg.removeClass().addClass("h4 text-left text-danger").text("Something went wrong. Please try again.");
+            $btn.prop("disabled", false).text("Send Me Message");
+          }
+        },
+        error: function () {
+          $msg.removeClass().addClass("h4 text-left text-danger").text("Network error. Please try again later.");
+          $btn.prop("disabled", false).text("Send Me Message");
         }
+      });
     });
-
-    function submitForm(){
-        // Initiate Variables With Form Content
-        var name = $("#name").val();
-        var email = $("#email").val();
-        var phone_number = $("#phone_number").val();
-        var subject = $("#subject").val();
-        var message = $("#message").val();
-
-        $.ajax({
-            type: "POST",
-            url: "https://script.google.com/macros/s/AKfycbz8QMx2QbRE_I5pDLvb_AU-jUL4vCTneYqkOQxhkc0o87BdtgO5T0A50XnHNC3VRo9u/exec",
-            data: {
-                name: name,
-                email: email,
-                phone_number: phone_number,
-                subject: subject,
-                message: message
-            },
-            success : function(text){
-                if (text == "success"){
-                    formSuccess();
-                } else {
-                    formError();
-                    submitMSG(false, text);
-                }
-            },
-            error: function() {
-                formError();
-                submitMSG(false, "Something went wrong. Please try again later.");
-            }
-        });
-    }
-
-    function formSuccess(){
-        // Reset form
-        $("#contactForm")[0].reset();
-
-        // Show success message
-        submitMSG(true, "✅ Message Submitted!");
-
-        // Disable submit button to prevent follow-ups
-        $("#contactForm button[type=submit]")
-            .prop("disabled", true)
-            .text("Message Sent");
-    }
-
-    function formError(){
-        $("#contactForm").removeClass().addClass('shake animated').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-            $(this).removeClass();
-        });
-    }
-
-    function submitMSG(valid, msg){
-        var msgClasses = valid
-            ? "h4 text-left tada animated text-success"
-            : "h4 text-left text-danger";
-
-        $("#msgSubmit").removeClass().addClass(msgClasses).text(msg);
-    }
-}(jQuery)); // End of use strict
+  });
+})(jQuery);

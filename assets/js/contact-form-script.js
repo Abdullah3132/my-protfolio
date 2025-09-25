@@ -42,7 +42,8 @@
 
     function formSuccess(){
         $("#contactForm")[0].reset();
-        submitMSG(true, "Message Submitted!")
+        // submitMSG(true, "Message Submitted!")
+        alert("Thanks! Your message has been sent.");
     }
 
     function formError(){
